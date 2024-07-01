@@ -1,5 +1,11 @@
+let modeModale = "creation";
+let dernierIdEnveloppe = 0;
+let idEnveloppeActuelle = null; // Ajout pour garder une trace de l'enveloppe actuellement modifiée
+let listeEnveloppes = [];
+
 class Enveloppe {
   constructor(nom = "Enveloppes", logo = "", montant = 0) {
+    this.id = ++dernierIdEnveloppe;
     this.nom = nom;
     this.logo = logo;
     this.montant = montant;
@@ -10,7 +16,7 @@ class Enveloppe {
     if (nom) this.nom = nom;
     if (logo) this.logo = logo;
     if (montant !== undefined) this.montant = montant;
-    this.dateCreation = new Date(); // Réinitialiser la date à chaque mise à jour
+    this.dateCreation = new Date();
   }
 
   joursDepuisModification() {
@@ -20,34 +26,35 @@ class Enveloppe {
   }
 
   render() {
-    return `<div class="enveloppe-card" data-montant="${this.montant}">
-                <div class="logo-categorie"><img src="${this.logo}" alt="Catégories" /></div>
-                <div class="enveloppe-content">
-                  <h2>${this.nom}</h2>
-                  <p>Il y a ${this.joursDepuisModification()} jours</p>
-                </div>
-                <p class="enveloppe-money">${this.montant} €</p>
-              </div>`;
+    return `<div class="enveloppe-card" data-montant="${this.montant}" data-nom="${
+      this.nom
+    }" data-logo="${this.logo}" data-id="${this.id}">
+              <div class="logo-categorie"><img src="${this.logo}" alt="Catégories" /></div>
+              <div class="enveloppe-content">
+                <h2>${this.nom}</h2>
+                <p>Il y a ${this.joursDepuisModification()} jours</p>
+              </div>
+              <p class="enveloppe-money">${this.montant} €</p>
+              <div class="enveloppe-config">
+                <img src="/assets/logos/parametre.png" class="config-icon" alt="Modifier" />
+                <img src="/assets/logos/effacer.png" class="delete-icon" alt="Supprimer" />
+              </div>
+            </div>`;
   }
 }
 
 const logosParCategorie = {
-  Nourriture: ["viande", "fast-food", "gateau-danniversaire", "tasse-a-cafe", "caddie", "fruit"],
-  Transport: ["voiture", "taxi", "bateau", "train", "bus", "billet"],
-  Charges: ["eau", "electricite", "internet", "telephone", "carburant", "argent"],
-  Loisirs: ["jeu", "voyage", "livre", "peche", "pelote-de-laine", "camping"],
-  Autres: [
-    "produits-de-beaute",
-    "rapport-medical",
-    "trousse-de-premiers-secours",
-    "tirelire",
-    "cheque",
-    "finance",
-  ],
+  Nourriture: ["viande", "fast-food", "gateau-danniversaire", "caddie"],
+  Transport: ["voiture", "train", "bus", "billet"],
+  Charges: ["eau", "internet", "telephone", "carburant"],
+  Loisirs: ["jeu", "ile", "livre", "peche"],
+  Autres: ["trousse-de-premiers-secours", "tirelire", "cheque", "finance"],
 };
 
-// Fonction pour créer et afficher la modale
-function ouvrirModale() {
+function ouvrirModale(nom = "", montant = "", logo = "", mode = "creation", idEnveloppe = null) {
+  modeModale = mode;
+  idEnveloppeActuelle = idEnveloppe;
+
   let modale = document.querySelector("#modaleCreation");
   if (!modale) {
     modale = document.createElement("div");
@@ -82,56 +89,82 @@ function ouvrirModale() {
         </div>
 
         <div id="buttons">
-          <button type="submit">Créer</button>
+          <button type="submit">${mode === "creation" ? "Créer" : "Modifier"}</button>
           <button type="button" id="fermerModale">Fermer</button>
         </div>
       </form>
     `;
     document.body.appendChild(modale);
 
-    // Ajouter un écouteur d'événement pour la sélection des logos
-    const logoOptions = modale.querySelectorAll(".logo-option");
-    logoOptions.forEach((option) => {
-      option.addEventListener("click", function () {
-        logoOptions.forEach((opt) => opt.classList.remove("selected"));
-        this.classList.add("selected");
-      });
+    // Ajout des gestionnaires d'événements ici pour éviter la duplication
+  }
+
+  // Mise à jour du bouton de soumission selon le mode
+  modale.querySelector("#buttons button[type='submit']").textContent =
+    mode === "creation" ? "Créer" : "Modifier";
+
+  const logoOptions = modale.querySelectorAll(".logo-option");
+  logoOptions.forEach((option) => {
+    option.addEventListener("click", function () {
+      logoOptions.forEach((opt) => opt.classList.remove("selected"));
+      this.classList.add("selected");
     });
+  });
 
-    // Gérer la soumission du formulaire
-    const form = modale.querySelector("#formCreation");
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      const nom = form.nom.value;
-      const montant = form.montant.value || undefined;
-      const logoSelectionne = modale.querySelector(".logo-option.selected img");
-      if (nom && logoSelectionne) {
-        // Créer et afficher l'enveloppe
-        const enveloppe = new Enveloppe();
-        enveloppe.update({ nom, logo: logoSelectionne.src, montant });
-        document.querySelector(".gallery").innerHTML += enveloppe.render(); // Code modifié
-        calculerEtAfficherTotal();
+  const form = modale.querySelector("#formCreation");
+  form.removeEventListener("submit", handleFormSubmit); // Supprime l'ancien gestionnaire pour éviter les duplications
+  form.addEventListener("submit", handleFormSubmit); // Ajoute le nouveau gestionnaire
 
-        // Fermer la modale après la création de l'enveloppe
-        modale.style.display = "none";
-        form.reset(); // Réinitialiser le formulaire
-        const logoOptions = modale.querySelectorAll(".logo-option");
-        logoOptions.forEach((opt) => opt.classList.remove("selected")); // Désélectionner tous les logos
-      } else {
-        alert("Veuillez sélectionner un nom et un logo.");
+  function handleFormSubmit(e) {
+    e.preventDefault();
+    const nom = form.nom.value.trim(); // Assurez-vous que le nom est bien récupéré et nettoyé des espaces inutiles
+    const montant = form.montant.value ? parseFloat(form.montant.value) : undefined; // Convertit le montant en nombre si présent, sinon undefined
+    const logoSelectionne = modale.querySelector(".logo-option.selected img");
+    const logoSrc = logoSelectionne ? logoSelectionne.getAttribute("src") : ""; // Utilise un logo vide si aucun n'est sélectionné
+
+    // Vérifie uniquement si le nom est présent, permettant la création/modification sans logo sélectionné
+    if (nom) {
+      if (modeModale === "creation") {
+        const enveloppe = new Enveloppe(nom, logoSrc, montant);
+        document.querySelector(".gallery").innerHTML += enveloppe.render();
+        listeEnveloppes.push(enveloppe);
+      } else if (modeModale === "modification" && idEnveloppeActuelle !== null) {
+        const enveloppeCard = document.querySelector(`[data-id="${idEnveloppeActuelle}"]`);
+        if (enveloppeCard) {
+          const enveloppe = retrouverEnveloppeParId(idEnveloppeActuelle);
+          enveloppe.update({ nom, logo: logoSrc, montant });
+          enveloppeCard.outerHTML = enveloppe.render();
+        }
       }
-    });
-
-    // Gérer le clic sur le bouton Fermer pour cacher la modale et réinitialiser le formulaire
-    const fermerModaleBtn = modale.querySelector("#fermerModale");
-    fermerModaleBtn.addEventListener("click", function () {
+      calculerEtAfficherTotal();
       modale.style.display = "none";
-      form.reset(); // Réinitialiser le formulaire
-      logoOptions.forEach((opt) => opt.classList.remove("selected")); // Désélectionner tous les logos
+      form.reset();
+      logoOptions.forEach((opt) => opt.classList.remove("selected"));
+    } else {
+      alert("Veuillez sélectionner un nom."); // Modifiez le message d'alerte pour refléter la validation actuelle
+    }
+  }
+
+  const fermerModaleBtn = modale.querySelector("#fermerModale");
+  fermerModaleBtn.addEventListener("click", function () {
+    modale.style.display = "none";
+    form.reset();
+    logoOptions.forEach((opt) => opt.classList.remove("selected"));
+  });
+
+  if (nom) modale.querySelector("#nom").value = nom;
+  if (montant) modale.querySelector("#montant").value = montant;
+  if (logo) {
+    const logoOptions = modale.querySelectorAll(".logo-option img");
+    logoOptions.forEach((option) => {
+      if (option.src === logo) {
+        option.parentElement.classList.add("selected");
+      } else {
+        option.parentElement.classList.remove("selected");
+      }
     });
   }
 
-  // Afficher la modale
   modale.style.display = "block";
 }
 
@@ -149,31 +182,44 @@ function calculerEtAfficherTotal() {
   document.querySelector(".total-envelope .money").textContent = totalFormate;
 }
 
+function ouvrirModalePourModification(enveloppeCard) {
+  const nom = enveloppeCard.getAttribute("data-nom");
+  const montant = enveloppeCard.getAttribute("data-montant");
+  const logo = enveloppeCard.getAttribute("data-logo");
+  const idEnveloppe = enveloppeCard.getAttribute("data-id");
+
+  ouvrirModale(nom, montant, logo, "modification", idEnveloppe);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelector(".btn-config").addEventListener("click", function () {
+    document.querySelectorAll(".enveloppe-config").forEach((config) => {
+      config.classList.toggle("visible");
+    });
+  });
+});
+
+document.addEventListener("click", function (e) {
+  if (e.target.classList.contains("delete-icon")) {
+    e.target.closest(".enveloppe-card").remove();
+    calculerEtAfficherTotal();
+  }
+});
+
+document.addEventListener("click", function (e) {
+  if (e.target.classList.contains("config-icon")) {
+    const enveloppeCard = e.target.closest(".enveloppe-card");
+    ouvrirModalePourModification(enveloppeCard);
+  }
+});
+
 document.addEventListener("DOMContentLoaded", function () {
   calculerEtAfficherTotal();
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-  // Collecter tous les éléments représentant les enveloppes
-  const enveloppes = document.querySelectorAll("[data-montant]");
-
-  // Calculer le total
-  let total = Array.from(enveloppes).reduce((acc, enveloppe) => {
-    const montant = parseFloat(
-      enveloppe.getAttribute("data-montant").replace(" €", "").replace(/\s/g, "")
-    );
-    return acc + montant;
-  }, 0);
-
-  // Formater le total en un format lisible (ex: 1 000 €)
-  const totalFormate = new Intl.NumberFormat("fr-FR", {
-    style: "currency",
-    currency: "EUR",
-  }).format(total);
-
-  // Afficher le total
-  document.querySelector(".total-envelope .money").textContent = totalFormate;
-});
-
 const addButton = document.querySelector(".btn-add");
-addButton.addEventListener("click", ouvrirModale);
+addButton.addEventListener("click", () => ouvrirModale());
+
+function retrouverEnveloppeParId(id) {
+  return listeEnveloppes.find((enveloppe) => enveloppe.id === parseInt(id, 10)) || null;
+}

@@ -12,6 +12,7 @@
   width: 90%;
   border-radius: 20px;
   color: white;
+  margin-bottom: 20px;
 }
 
 .enveloppe-card .logo-categorie {
@@ -24,9 +25,11 @@
   width: 80px;
   height: 80px;
   padding: 5px;
+  z-index: 11;
 }
 
 .enveloppe-content {
+  position: relative;
   display: flex;
   flex-direction: column;
   margin: 10px;
@@ -56,6 +59,40 @@
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+}
+
+.enveloppe-config {
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  right: 20px;
+  width: 50%;
+  border-radius: 20px;
+  position: absolute;
+  z-index: 10;
+  background: #1e2b5f;
+  padding: 15px 40px 15px 45px;
+}
+
+.enveloppe-config img {
+  width: 70px;
+  height: 70px;
+  padding: 5px;
+}
+
+.enveloppe-config .config-icon {
+  background: #28d399;
+  border-radius: 50px;
+  margin-right: 10px;
+}
+
+.enveloppe-config .delete-icon {
+  background: #dc3545;
+  border-radius: 50px;
+}
+
+.enveloppe-config.visible {
+  display: flex;
 }
 
 /*-------------------------------------------------*/
@@ -95,6 +132,7 @@
   align-items: center;
   justify-content: center;
   margin-right: 10px;
+  width: 20%;
   cursor: pointer;
   border: 2px solid transparent; /* Ajoute une bordure transparente pour éviter des décalages lors de la sélection */
 }
@@ -161,6 +199,7 @@
 
 .logos {
   display: flex;
+  flex-wrap: wrap;
 }
 
 .categorie:last-child {
