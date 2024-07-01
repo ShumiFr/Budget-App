@@ -1,3 +1,11 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+import {
+  getFirestore,
+  getDocs,
+  collection,
+} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyAwcxsA1zZgCc4SE9WdQtOiISUgjCopKrc",
   authDomain: "budget-app-7fc35.firebaseapp.com",
@@ -8,10 +16,27 @@ const firebaseConfig = {
   measurementId: "G-Y4EKYKLQ51",
 };
 
-firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
 
-// Étape 5 : Authentification Firebase dans le frontend
-const auth = firebase.auth();
+export function chargerEnveloppesDepuisFirebase() {
+  console.log("Tentative de chargement des enveloppes depuis Firebase...");
+  return getDocs(collection(db, "enveloppes"))
+    .then((snapshot) => {
+      const enveloppes = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        enveloppes.push({ ...data, id: doc.id });
+      });
+      console.log("Enveloppes chargées avec succès :", enveloppes);
+      return enveloppes;
+    })
+    .catch((error) => {
+      console.error("Erreur lors du chargement des enveloppes depuis Firebase :", error);
+      throw error; // Propager l'erreur pour une gestion ultérieure
+    });
+}
 
 export const registerUser = (email, password) => {
   auth
@@ -43,18 +68,6 @@ export const logoutUser = () => {
     .signOut()
     .then(() => {
       console.log("Utilisateur déconnecté");
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-};
-
-// Réinitialisation du mot de passe
-export const resetPassword = (email) => {
-  auth
-    .sendPasswordResetEmail(email)
-    .then(() => {
-      console.log("Email de réinitialisation envoyé");
     })
     .catch((error) => {
       console.error(error);

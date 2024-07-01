@@ -2,6 +2,16 @@ let modeModale = "creation";
 let dernierIdEnveloppe = 0;
 let idEnveloppeActuelle = null; // Ajout pour garder une trace de l'enveloppe actuellement modifiée
 let listeEnveloppes = [];
+import { db, checkUserStatus } from "../data/firebase.js";
+import {
+  doc,
+  updateDoc,
+  addDoc,
+  collection,
+  getDocs,
+} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+
+let userId = null;
 
 class Enveloppe {
   constructor(nom = "Enveloppes", logo = "", montant = 0) {
@@ -23,6 +33,34 @@ class Enveloppe {
     const maintenant = new Date();
     const diff = maintenant - this.dateCreation;
     return Math.floor(diff / (1000 * 60 * 60 * 24));
+  }
+
+  save(userId) {
+    const userCollectionPath = `utilisateurs/${userId}/enveloppes`;
+    if (this.firestoreId) {
+      // Mise à jour de l'enveloppe existante
+      const enveloppeRef = doc(db, userCollectionPath, this.firestoreId);
+      return updateDoc(enveloppeRef, {
+        nom: this.nom,
+        logo: this.logo,
+        montant: this.montant,
+        dateCreation: this.dateCreation,
+      });
+    } else {
+      // Création d'une nouvelle enveloppe
+      return addDoc(collection(db, userCollectionPath), {
+        nom: this.nom,
+        logo: this.logo,
+        montant: this.montant,
+        dateCreation: this.dateCreation,
+      }).then((docRef) => {
+        this.firestoreId = docRef.id; // Firestore génère un ID de type string
+      });
+    }
+  }
+
+  static delete(id) {
+    return deleteDoc(doc(db, "enveloppes", id));
   }
 
   render() {
@@ -50,6 +88,20 @@ const logosParCategorie = {
   Loisirs: ["jeu", "ile", "livre", "peche"],
   Autres: ["trousse-de-premiers-secours", "tirelire", "cheque", "finance"],
 };
+
+function chargerEnveloppes(userId) {
+  const userCollectionPath = `utilisateurs/${userId}/enveloppes`;
+  getDocs(collection(db, userCollectionPath)).then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const enveloppe = new Enveloppe(data.nom, data.logo, data.montant);
+      enveloppe.firestoreId = doc.id; // Assurez-vous d'assigner l'ID de Firestore à l'instance de l'enveloppe
+      listeEnveloppes.push(enveloppe);
+      document.querySelector(".gallery").innerHTML += enveloppe.render(); // Assurez-vous que le sélecteur correspond à votre conteneur d'enveloppes
+    });
+    calculerEtAfficherTotal(); // Mettez à jour le total après avoir chargé toutes les enveloppes
+  });
+}
 
 function ouvrirModale(nom = "", montant = "", logo = "", mode = "creation", idEnveloppe = null) {
   modeModale = mode;
@@ -128,12 +180,15 @@ function ouvrirModale(nom = "", montant = "", logo = "", mode = "creation", idEn
         const enveloppe = new Enveloppe(nom, logoSrc, montant);
         document.querySelector(".gallery").innerHTML += enveloppe.render();
         listeEnveloppes.push(enveloppe);
+        enveloppe.save(userId); // Ajout de cette ligne pour sauvegarder la nouvelle enveloppe
       } else if (modeModale === "modification" && idEnveloppeActuelle !== null) {
+        // Lors de la modification d'une enveloppe existante
         const enveloppeCard = document.querySelector(`[data-id="${idEnveloppeActuelle}"]`);
         if (enveloppeCard) {
           const enveloppe = retrouverEnveloppeParId(idEnveloppeActuelle);
           enveloppe.update({ nom, logo: logoSrc, montant });
           enveloppeCard.outerHTML = enveloppe.render();
+          enveloppe.save(userId); // Ajout de cette ligne pour mettre à jour l'enveloppe
         }
       }
       calculerEtAfficherTotal();
@@ -190,6 +245,17 @@ function ouvrirModalePourModification(enveloppeCard) {
 
   ouvrirModale(nom, montant, logo, "modification", idEnveloppe);
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  checkUserStatus((isLoggedIn, user) => {
+    if (isLoggedIn) {
+      userId = user.uid;
+      chargerEnveloppes(userId);
+    } else {
+      console.log("Utilisateur non connecté");
+    }
+  });
+});
 
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelector(".btn-config").addEventListener("click", function () {
