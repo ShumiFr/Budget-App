@@ -75,3 +75,7 @@
 .menu .add-active img {
   background: #28d399;
 }
+
+.menu .add-inactive img {
+  background: grey;
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <link rel="stylesheet" href="/styles/menu.css" />
+    <link rel="stylesheet" href="/styles/style.css" />
+    <link rel="stylesheet" href="/styles/user.css" />
+    <title>Page Utilisateur</title>
+  </head>
+  <body>
+    <div id="sectionConnexion" style="display: none">
+      <!-- Formulaire de connexion -->
+      <h2>Connectez-vous...</h2>
+
+      <form action="/login" method="post" id="formConnexion">
+        <input type="text" name="emailConnexion" placeholder="Nom d'utilisateur" required />
+        <input type="password" name="passwordConnexion" placeholder="Mot de passe" required />
+        <button type="submit">Se connecter</button>
+      </form>
+    </div>
+
+    <div id="sectionInscription" style="display: none">
+      <!-- Formulaire d'inscription -->
+      <h2>... Ou inscrivez-vous</h2>
+      <form action="/signup" method="post" id="formInscription">
+        <input type="text" id="emailInscription" placeholder="Email" />
+        <input type="password" id="passwordInscription" placeholder="Mot de passe" />
+        <button type="submit">Inscription</button>
+      </form>
+    </div>
+
+    <div id="sectionInfosUtilisateur" style="display: none">
+      <header>
+        <img src="../assets/logos/femme.png" alt="Logo Utilisateur" />
+        <p>Bienvenue sur ta page d'<strong>Utilisateur</strong> !</p>
+      </header>
+      <!-- Le reste de la structure existante -->
+    </div>
+
+    <div class="menu">
+      <a href="../index.html" class="btn-home">
+        <img src="/assets/logos/home.png" alt="Accueil" />
+      </a>
+      <a href="./accountPage.html" class="btn-account">
+        <img src="/assets/logos/compte.png" alt="Comptes Bancaires" />
+      </a>
+      <a class="btn-add add-inactive">
+        <img src="/assets/logos/add.png" alt="Ajouter" />
+      </a>
+      <a href="./enveloppePage.html" class="btn-envelope">
+        <img src="/assets/logos/enveloppe.png" alt="Enveloppes" />
+      </a>
+      <a href="./userPage.html" class="btn-userAccount active">
+        <img src="/assets/logos/user active.png" alt="Compte Utilisateur" />
+      </a>
+    </div>
+
+    <script type="module" src="/script/userPage.js"></script>
+  </body>
+</html>
