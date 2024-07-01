@@ -4,7 +4,13 @@ import {
   getDocs,
   collection,
 } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAwcxsA1zZgCc4SE9WdQtOiISUgjCopKrc",
@@ -38,9 +44,9 @@ export function chargerEnveloppesDepuisFirebase() {
     });
 }
 
+// Ajustez la fonction registerUser
 export const registerUser = (email, password) => {
-  auth
-    .createUserWithEmailAndPassword(email, password)
+  createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       // Utilisateur créé
       console.log(userCredential);
@@ -50,9 +56,9 @@ export const registerUser = (email, password) => {
     });
 };
 
+// Ajustez la fonction loginUser
 export const loginUser = (email, password) => {
-  auth
-    .signInWithEmailAndPassword(email, password)
+  signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       // Utilisateur connecté
       console.log(userCredential);
@@ -62,10 +68,9 @@ export const loginUser = (email, password) => {
     });
 };
 
-// Déconnexion de l'utilisateur
+// Ajustez la fonction logoutUser
 export const logoutUser = () => {
-  auth
-    .signOut()
+  signOut(auth)
     .then(() => {
       console.log("Utilisateur déconnecté");
     })
@@ -74,9 +79,9 @@ export const logoutUser = () => {
     });
 };
 
-// Vérification de l'état de connexion de l'utilisateur
+// Ajustez la fonction checkUserStatus
 export const checkUserStatus = (callback) => {
-  auth.onAuthStateChanged((user) => {
+  onAuthStateChanged(auth, (user) => {
     if (user) {
       // Utilisateur est connecté
       callback(true, user);
