@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/styles/menu.css" />
     <link rel="stylesheet" href="/styles/style.css" />
+    <link rel="stylesheet" href="/styles/index.css" />
     <script type="module" src="/data/firebase.js"></script>
     <title>Accueil</title>
   </head>
@@ -15,7 +16,7 @@
     </header>
     <span class="total-combined">
       <p>Total Comptes & Enveloppes</p>
-      <p>15000 €</p>
+      <p class="money">15000 €</p>
     </span>
     <main class="main">
       <section class="accounts">
@@ -24,11 +25,11 @@
       </section>
       <section class="envelopes">
         <h2>Mes Enveloppes</h2>
-        <!-- Liste des enveloppes ici -->
+        <div class="gallery"></div>
       </section>
       <div class="menu">
         <a href="/index.html" class="btn-home active">
-          <img src="/assets/logos/home.png" alt="Accueil" />
+          <img src="/assets/logos/home active.png" alt="Accueil" />
         </a>
         <a href="./pages/accountPage.html" class="btn-account">
           <img src="/assets/logos/compte.png" alt="Comptes Bancaires" />
@@ -44,5 +45,6 @@
         </a>
       </div>
     </main>
+    <script type="module" src="/script/index.js"></script>
   </body>
 </html>

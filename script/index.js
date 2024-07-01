@@ -1,52 +1,42 @@
-// Étape 1 : Initialiser les données
-let comptes = [];
-let enveloppes = [];
+import {
+  getDocs,
+  collection,
+} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { db } from "../data/firebase.js";
+import { checkUserStatus } from "../data/firebase.js";
 
-// Étape 2 : Récupérer les données (simulation)
-function recupererDonnees() {
-  // Simulation de données récupérées
-  comptes = [
-    { nom: "Compte Courant", solde: 1200 },
-    { nom: "Compte Épargne", solde: 3500 },
-  ];
-  enveloppes = [
-    { nom: "Loisirs", montant: 150 },
-    { nom: "Épicerie", montant: 250 },
-  ];
+let userId = null;
 
-  // Mise à jour de l'interface utilisateur
-  afficherTotalCombine();
-  genererListeComptes();
-  genererListeEnveloppes();
-}
-
-// Étape 3 : Afficher le total combiné
-function afficherTotalCombine() {
-  const totalComptes = comptes.reduce((acc, compte) => acc + compte.solde, 0);
-  const totalEnveloppes = enveloppes.reduce((acc, enveloppe) => acc + enveloppe.montant, 0);
-  const totalCombine = totalComptes + totalEnveloppes;
-  document.querySelector(".total-combined p:nth-child(2)").textContent = `${totalCombine} €`;
-}
-
-// Étape 4 : Générer la liste des comptes
-function genererListeComptes() {
-  const sectionComptes = document.querySelector(".accounts");
-  comptes.forEach((compte) => {
-    const item = document.createElement("p");
-    item.textContent = `${compte.nom}: ${compte.solde} €`;
-    sectionComptes.appendChild(item);
+function chargerEnveloppes(userId) {
+  const userCollectionPath = `utilisateurs/${userId}/enveloppes`;
+  const tableauEnveloppes = []; // Étape 1: Initialiser un tableau vide
+  getDocs(collection(db, userCollectionPath)).then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      // Étape 3: Extraire le nom et le montant et les ajouter au tableau
+      tableauEnveloppes.push({ nom: data.nom, montant: data.montant });
+    });
+    // Étape 4: Utiliser le tableau pour afficher les informations
+    afficherTableauEnveloppes(tableauEnveloppes);
   });
 }
 
-// Étape 5 : Générer la liste des enveloppes
-function genererListeEnveloppes() {
-  const sectionEnveloppes = document.querySelector(".envelopes");
-  enveloppes.forEach((enveloppe) => {
-    const item = document.createElement("p");
-    item.textContent = `${enveloppe.nom}: ${enveloppe.montant} €`;
-    sectionEnveloppes.appendChild(item);
+function afficherTableauEnveloppes(tableauEnveloppes) {
+  let htmlTableau = "<table><tr><th>Nom</th><th>Montant</th></tr>";
+  tableauEnveloppes.forEach((enveloppe) => {
+    htmlTableau += `<tr><td>${enveloppe.nom}</td><td>${enveloppe.montant} €</td></tr>`;
   });
+  htmlTableau += "</table>";
+  document.querySelector(".gallery").innerHTML = htmlTableau; // Assurez-vous que le sélecteur correspond à votre conteneur
 }
 
-// Étape 6 : Initialisation
-document.addEventListener("DOMContentLoaded", recupererDonnees);
+document.addEventListener("DOMContentLoaded", function () {
+  checkUserStatus((isLoggedIn, user) => {
+    if (isLoggedIn) {
+      userId = user.uid;
+      chargerEnveloppes(userId);
+    } else {
+      console.log("Utilisateur non connecté");
+    }
+  });
+});

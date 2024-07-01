@@ -1,0 +1,60 @@
+body {
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+table {
+  width: 100%; /* Ajustez la largeur selon vos besoins */
+  border-collapse: collapse; /* Pour que les bordures des cellules soient collées */
+}
+
+th,
+td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+main {
+  width: 100%;
+}
+
+.total-combined {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 20px;
+  color: white;
+  border-radius: 20px;
+  width: 80%;
+  background: linear-gradient(150deg, rgba(133, 183, 244, 0) 50%, #28d79c 100%),
+    linear-gradient(220deg, #388ee7 50%, #ef6fa8 100%);
+}
+
+.total-combined .money {
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  margin: 10px;
+  margin-bottom: 20px;
+}
+
+.accounts,
+.envelopes {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.gallery {
+  width: 90%;
+}
