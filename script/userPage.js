@@ -4,12 +4,14 @@ document.addEventListener("DOMContentLoaded", function () {
   checkUserStatus((isLoggedIn, user) => {
     if (isLoggedIn) {
       console.log("Utilisateur connecté:", user);
-      // Rediriger vers la page des enveloppes si déjà connecté
-      window.location.href = "/pages/enveloppePage.html";
+      // Afficher la section utilisateur au lieu de rediriger
+      document.getElementById("sectionInfosUtilisateur").style.display = "flex";
+      document.getElementById("sectionConnexion").style.display = "none";
+      document.getElementById("sectionInscription").style.display = "none";
     } else {
       console.log("Utilisateur non connecté");
-      document.getElementById("sectionConnexion").style.display = "block";
-      document.getElementById("sectionInscription").style.display = "block";
+      document.getElementById("sectionConnexion").style.display = "flex";
+      document.getElementById("sectionInscription").style.display = "flex";
     }
   });
 });
@@ -22,8 +24,10 @@ document.getElementById("formInscription").addEventListener("submit", function (
 
   registerUser(email, password).then(() => {
     console.log("Utilisateur créé");
-    // Rediriger vers la page des enveloppes après l'inscription
-    window.location.href = "/pages/enveloppePage.html";
+    // Afficher la section utilisateur après l'inscription
+    document.getElementById("sectionInfosUtilisateur").style.display = "flex";
+    document.getElementById("sectionConnexion").style.display = "none";
+    document.getElementById("sectionInscription").style.display = "none";
   });
 });
 
@@ -33,14 +37,15 @@ document.getElementById("formConnexion").addEventListener("submit", (e) => {
   const password = document.getElementById("passwordConnexion").value;
 
   loginUser(email, password).then(() => {
-    // Rediriger vers la page des enveloppes après la connexion
-    window.location.href = "/pages/enveloppePage.html";
+    // Afficher la section utilisateur après la connexion
+    document.getElementById("sectionInfosUtilisateur").style.display = "flex";
+    document.getElementById("sectionConnexion").style.display = "none";
+    document.getElementById("sectionInscription").style.display = "none";
   });
 });
 
-document.getElementById("boutonDeconnexion").addEventListener("click", (e) => {
+document.querySelector(".btnDeconnexion").addEventListener("click", (e) => {
   logoutUser().then(() => {
-    // Optionnel : Rediriger vers la page d'accueil après la déconnexion
-    window.location.href = "/pages/enveloppePage.html";
+    window.location.reload();
   });
 });
