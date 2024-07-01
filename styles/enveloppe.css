@@ -1,0 +1,168 @@
+.gallery {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.enveloppe-card {
+  display: flex;
+  background: #1e2b5f;
+  width: 90%;
+  border-radius: 20px;
+  color: white;
+}
+
+.enveloppe-card .logo-categorie {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.enveloppe-card .logo-categorie img {
+  width: 80px;
+  height: 80px;
+  padding: 5px;
+}
+
+.enveloppe-content {
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+  width: 40%;
+}
+
+.enveloppe-content h2 {
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.enveloppe-content p {
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.enveloppe-money {
+  justify-content: flex-end;
+  align-self: center;
+  color: #28d399;
+  padding: 20px;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+/*-------------------------------------------------*/
+
+#modaleCreation {
+  position: fixed;
+  border-radius: 20px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 400px;
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: none; /* Cache la modale par défaut */
+}
+
+#modaleCreation form {
+  display: flex;
+  flex-direction: column;
+}
+
+#modaleCreation label {
+  margin-top: 10px;
+}
+
+#modaleCreation input[type="text"],
+#modaleCreation input[type="number"] {
+  padding: 8px;
+  margin-top: 5px;
+}
+
+#modaleCreation .logo-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  cursor: pointer;
+  border: 2px solid transparent; /* Ajoute une bordure transparente pour éviter des décalages lors de la sélection */
+}
+
+#modaleCreation .logo-option.selected {
+  border-color: blue; /* Change la couleur de la bordure pour l'option sélectionnée */
+}
+
+#modaleCreation .logo-option img {
+  width: 50px; /* Ajustez selon la taille souhaitée pour les logos */
+  height: auto;
+}
+
+#modaleCreation button[type="submit"] {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#modaleCreation button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+#modaleCreation #montant {
+  margin-bottom: 10px;
+}
+
+#modaleCreation #buttons {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+#modaleCreation #buttons button {
+  margin: 10px;
+  width: 50%;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+#modaleCreation #buttons #fermerModale {
+  background: #dc3545;
+  color: white;
+}
+
+.categorie {
+  display: flex;
+  flex-direction: column;
+}
+
+.categorie h3 {
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  margin: 0;
+  margin-top: 15px;
+}
+
+.logos {
+  display: flex;
+}
+
+.categorie:last-child {
+  margin-bottom: 30px;
+}

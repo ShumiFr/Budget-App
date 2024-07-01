@@ -1,0 +1,77 @@
+.menu {
+  position: fixed;
+  bottom: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  background: #1f2b5f;
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1f2b5f;
+  border: none;
+  cursor: pointer;
+  width: 20%;
+  padding-top: 15px;
+  padding-bottom: 20px;
+}
+
+.menu a img {
+  width: 50px;
+  height: 50px;
+}
+
+.menu .btn-account img {
+  width: 35px;
+  height: 35px;
+}
+
+.menu .btn-home img {
+  width: 40px;
+  height: 40px;
+}
+
+.menu .btn-userAccount img {
+  width: 30px;
+  height: 30px;
+}
+
+.menu .btn-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 50px;
+}
+
+.menu .btn-add img {
+  position: absolute;
+  top: -25px;
+  border-radius: 50px;
+  width: 60px;
+  height: 60px;
+}
+
+.active {
+  position: relative;
+}
+
+.active::after {
+  content: "";
+  display: flex;
+  align-items: center;
+  bottom: 8px;
+  position: absolute;
+  background-color: #28d399;
+  border-radius: 50px;
+  width: 10px;
+  height: 10px;
+}
+
+.menu .add-active img {
+  background: #28d399;
+}
