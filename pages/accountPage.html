@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/styles/menu.css" />
     <link rel="stylesheet" href="/styles/style.css" />
+    <link rel="stylesheet" href="/styles/account.css" />
+    <link rel="stylesheet" href="/styles/accountPage.css" />
     <title>Enveloppes</title>
   </head>
   <body>
@@ -13,7 +15,21 @@
       <p>Bienvenue sur la page des <strong>Comptes</strong> !</p>
     </header>
 
+    <span class="total-account">
+      <p>Total des comptes</p>
+      <p class="money">0 €</p>
+    </span>
+
     <main class="main">
+      <div class="main-header">
+        <h1>Comptes</h1>
+        <button class="btn-config">
+          <img src="/assets/logos/config.png" alt="Button de configuration" />
+        </button>
+      </div>
+
+      <div class="gallery"></div>
+
       <div class="menu">
         <a href="/index.html" class="btn-home">
           <img src="../assets/logos/home.png" alt="Accueil" />
@@ -32,5 +48,6 @@
         </a>
       </div>
     </main>
+    <script type="module" src="/script/account.js"></script>
   </body>
 </html>

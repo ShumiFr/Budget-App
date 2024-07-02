@@ -1,7 +1,7 @@
 let modeModale = "creation";
-let dernierIdEnveloppe = 0;
-let idEnveloppeActuelle = null; // Ajout pour garder une trace de l'enveloppe actuellement modifiée
-let listeEnveloppes = [];
+let dernierIdCompte = 0;
+let idCompteActuel = null;
+let listeComptes = [];
 import { db, checkUserStatus } from "../data/firebase.js";
 import {
   doc,
@@ -13,9 +13,9 @@ import {
 
 let userId = null;
 
-class Enveloppe {
-  constructor(nom = "Enveloppes", logo = "", montant = 0) {
-    this.id = ++dernierIdEnveloppe;
+class Compte {
+  constructor(nom = "Compte", logo = "", montant = 0) {
+    this.id = ++dernierIdCompte;
     this.nom = nom;
     this.logo = logo;
     this.montant = montant;
@@ -36,11 +36,11 @@ class Enveloppe {
   }
 
   save(userId) {
-    const userCollectionPath = `utilisateurs/${userId}/enveloppes`;
+    const userCollectionPath = `utilisateurs/${userId}/comptes`;
     if (this.firestoreId) {
       // Mise à jour de l'enveloppe existante
-      const enveloppeRef = doc(db, userCollectionPath, this.firestoreId);
-      return updateDoc(enveloppeRef, {
+      const compteRef = doc(db, userCollectionPath, this.firestoreId);
+      return updateDoc(compteRef, {
         nom: this.nom,
         logo: this.logo,
         montant: this.montant,
@@ -60,24 +60,24 @@ class Enveloppe {
   }
 
   static delete(id) {
-    return deleteDoc(doc(db, "enveloppes", id));
+    return deleteDoc(doc(db, "comptes", id));
   }
 
   render() {
-    return `<div class="enveloppe-card" data-montant="${this.montant}" data-nom="${
+    return `<div class="compte-card" data-montant="${this.montant}" data-nom="${
       this.nom
     }" data-logo="${this.logo}" data-id="${this.id}">
-              <div class="logo-categorie"><img src="${this.logo}" alt="Catégories" /></div>
-              <div class="enveloppe-content">
-                <h2>${this.nom}</h2>
-                <p>Il y a ${this.joursDepuisModification()} jours</p>
-              </div>
-              <p class="enveloppe-money">${this.montant} €</p>
-              <div class="enveloppe-config">
-                <img src="/assets/logos/parametre.png" class="config-icon" alt="Modifier" />
-                <img src="/assets/logos/effacer.png" class="delete-icon" alt="Supprimer" />
-              </div>
-            </div>`;
+                <div class="logo-categorie"><img src="${this.logo}" alt="Catégories" /></div>
+                <div class="compte-content">
+                  <h2>${this.nom}</h2>
+                  <p>Il y a ${this.joursDepuisModification()} jours</p>
+                </div>
+                <p class="compte-money">${this.montant} €</p>
+                <div class="compte-config">
+                  <img src="/assets/logos/parametre.png" class="config-icon" alt="Modifier" />
+                  <img src="/assets/logos/effacer.png" class="delete-icon" alt="Supprimer" />
+                </div>
+              </div>`;
   }
 }
 
@@ -150,64 +150,64 @@ const logosParCategorie = {
   ],
 };
 
-function chargerEnveloppes(userId) {
-  const userCollectionPath = `utilisateurs/${userId}/enveloppes`;
+function chargerComptes(userId) {
+  const userCollectionPath = `utilisateurs/${userId}/comptes`;
   getDocs(collection(db, userCollectionPath)).then((querySnapshot) => {
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      const enveloppe = new Enveloppe(data.nom, data.logo, data.montant);
-      enveloppe.firestoreId = doc.id; // Assurez-vous d'assigner l'ID de Firestore à l'instance de l'enveloppe
-      listeEnveloppes.push(enveloppe);
-      document.querySelector(".gallery").innerHTML += enveloppe.render(); // Assurez-vous que le sélecteur correspond à votre conteneur d'enveloppes
+      const compte = new Compte(data.nom, data.logo, data.montant);
+      compte.firestoreId = doc.id; // Assurez-vous d'assigner l'ID de Firestore à l'instance de l'enveloppe
+      listeComptes.push(compte);
+      document.querySelector(".gallery").innerHTML += compte.render(); // Assurez-vous que le sélecteur correspond à votre conteneur d'enveloppes
     });
     calculerEtAfficherTotal(); // Mettez à jour le total après avoir chargé toutes les enveloppes
   });
 }
 
-function ouvrirModale(nom = "", montant = "", logo = "", mode = "creation", idEnveloppe = null) {
+function ouvrirModale(nom = "", montant = "", logo = "", mode = "creation", idCompte = null) {
   modeModale = mode;
-  idEnveloppeActuelle = idEnveloppe;
+  idCompteActuel = idCompte;
 
   let modale = document.querySelector("#modaleCreation");
   if (!modale) {
     modale = document.createElement("div");
     modale.id = "modaleCreation";
     modale.innerHTML = `
-      <form id="formCreation">
-        <h2>Création d'une enveloppe</h2>
-        <label for="nom">Nom:</label>
-        <input type="text" id="nom" name="nom" required>
-        
-        <label for="montant">Montant (optionnel):</label>
-        <input type="number" id="montant" name="montant">
-        
-        <div id="logos">
-          ${Object.entries(logosParCategorie)
-            .map(
-              ([categorie, logos]) => `
-            <div class="categorie">
-              <h3>${categorie}</h3>
-              <div class="logos">
-                ${logos
-                  .map(
-                    (logo) => `
-                  <div class="logo-option"><img src="/assets/logos/${logo}.png" alt="${logo}"></div>
-                `
-                  )
-                  .join("")}
-                </div>
-            </div>
-          `
-            )
-            .join("")}
-        </div>
-
-        <div id="buttons">
-          <button type="submit">${mode === "creation" ? "Créer" : "Modifier"}</button>
-          <button type="button" id="fermerModale">Fermer</button>
-        </div>
-      </form>
-    `;
+        <form id="formCreation">
+          <h2>Création d'un compte</h2>
+          <label for="nom">Nom:</label>
+          <input type="text" id="nom" name="nom" required>
+          
+          <label for="montant">Montant (optionnel):</label>
+          <input type="number" id="montant" name="montant">
+          
+          <div id="logos">
+            ${Object.entries(logosParCategorie)
+              .map(
+                ([categorie, logos]) => `
+              <div class="categorie">
+                <h3>${categorie}</h3>
+                <div class="logos">
+                  ${logos
+                    .map(
+                      (logo) => `
+                    <div class="logo-option"><img src="/assets/logos/${logo}.png" alt="${logo}"></div>
+                  `
+                    )
+                    .join("")}
+                  </div>
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+  
+          <div id="buttons">
+            <button type="submit">${mode === "creation" ? "Créer" : "Modifier"}</button>
+            <button type="button" id="fermerModale">Fermer</button>
+          </div>
+        </form>
+      `;
     document.body.appendChild(modale);
 
     // Ajout des gestionnaires d'événements ici pour éviter la duplication
@@ -239,18 +239,18 @@ function ouvrirModale(nom = "", montant = "", logo = "", mode = "creation", idEn
     // Vérifie uniquement si le nom est présent, permettant la création/modification sans logo sélectionné
     if (nom) {
       if (modeModale === "creation") {
-        const enveloppe = new Enveloppe(nom, logoSrc, montant);
-        document.querySelector(".gallery").innerHTML += enveloppe.render();
-        listeEnveloppes.push(enveloppe);
-        enveloppe.save(userId); // Ajout de cette ligne pour sauvegarder la nouvelle enveloppe
-      } else if (modeModale === "modification" && idEnveloppeActuelle !== null) {
+        const compte = new Compte(nom, logoSrc, montant);
+        document.querySelector(".gallery").innerHTML += compte.render();
+        listeComptes.push(compte);
+        compte.save(userId); // Ajout de cette ligne pour sauvegarder la nouvelle enveloppe
+      } else if (modeModale === "modification" && idCompteActuel !== null) {
         // Lors de la modification d'une enveloppe existante
-        const enveloppeCard = document.querySelector(`[data-id="${idEnveloppeActuelle}"]`);
-        if (enveloppeCard) {
-          const enveloppe = retrouverEnveloppeParId(idEnveloppeActuelle);
-          enveloppe.update({ nom, logo: logoSrc, montant });
-          enveloppeCard.outerHTML = enveloppe.render();
-          enveloppe.save(userId); // Ajout de cette ligne pour mettre à jour l'enveloppe
+        const compteCard = document.querySelector(`[data-id="${idCompteActuel}"]`);
+        if (compteCard) {
+          const compte = retrouverCompteParId(idCompteActuel);
+          compte.update({ nom, logo: logoSrc, montant });
+          compteCard.outerHTML = compte.render();
+          compte.save(userId); // Ajout de cette ligne pour mettre à jour l'enveloppe
         }
       }
       calculerEtAfficherTotal();
@@ -286,9 +286,9 @@ function ouvrirModale(nom = "", montant = "", logo = "", mode = "creation", idEn
 }
 
 function calculerEtAfficherTotal() {
-  const enveloppes = document.querySelectorAll(".enveloppe-card");
-  let total = Array.from(enveloppes).reduce((acc, enveloppe) => {
-    const montant = parseFloat(enveloppe.getAttribute("data-montant"));
+  const comptes = document.querySelectorAll(".compte-card");
+  let total = Array.from(comptes).reduce((acc, compte) => {
+    const montant = parseFloat(compte.getAttribute("data-montant"));
     return acc + montant;
   }, 0);
 
@@ -296,23 +296,23 @@ function calculerEtAfficherTotal() {
     style: "currency",
     currency: "EUR",
   }).format(total);
-  document.querySelector(".total-envelope .money").textContent = totalFormate;
+  document.querySelector(".total-account .money").textContent = totalFormate;
 }
 
-function ouvrirModalePourModification(enveloppeCard) {
-  const nom = enveloppeCard.getAttribute("data-nom");
-  const montant = enveloppeCard.getAttribute("data-montant");
-  const logo = enveloppeCard.getAttribute("data-logo");
-  const idEnveloppe = enveloppeCard.getAttribute("data-id");
+function ouvrirModalePourModification(compteCard) {
+  const nom = compteCard.getAttribute("data-nom");
+  const montant = compteCard.getAttribute("data-montant");
+  const logo = compteCard.getAttribute("data-logo");
+  const idCompte = compteCard.getAttribute("data-id");
 
-  ouvrirModale(nom, montant, logo, "modification", idEnveloppe);
+  ouvrirModale(nom, montant, logo, "modification", idCompte);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
   checkUserStatus((isLoggedIn, user) => {
     if (isLoggedIn) {
       userId = user.uid;
-      chargerEnveloppes(userId);
+      chargerComptes(userId);
     } else {
       console.log("Utilisateur non connecté");
     }
@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelector(".btn-config").addEventListener("click", function () {
-    document.querySelectorAll(".enveloppe-config").forEach((config) => {
+    document.querySelectorAll(".compte-config").forEach((config) => {
       config.classList.toggle("visible");
     });
   });
@@ -329,15 +329,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.addEventListener("click", function (e) {
   if (e.target.classList.contains("delete-icon")) {
-    e.target.closest(".enveloppe-card").remove();
+    e.target.closest(".compte-card").remove();
     calculerEtAfficherTotal();
   }
 });
 
 document.addEventListener("click", function (e) {
   if (e.target.classList.contains("config-icon")) {
-    const enveloppeCard = e.target.closest(".enveloppe-card");
-    ouvrirModalePourModification(enveloppeCard);
+    const compteCard = e.target.closest(".compte-card");
+    ouvrirModalePourModification(compteCard);
   }
 });
 
@@ -348,6 +348,6 @@ document.addEventListener("DOMContentLoaded", function () {
 const addButton = document.querySelector(".btn-add");
 addButton.addEventListener("click", () => ouvrirModale());
 
-function retrouverEnveloppeParId(id) {
-  return listeEnveloppes.find((enveloppe) => enveloppe.id === parseInt(id, 10)) || null;
+function retrouverCompteParId(id) {
+  return listeComptes.find((compte) => compte.id === parseInt(id, 10)) || null;
 }
