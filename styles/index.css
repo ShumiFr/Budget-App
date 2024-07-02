@@ -55,6 +55,10 @@ main {
   width: 100%;
 }
 
-.gallery {
+.gallery-comptes {
+  width: 90%;
+}
+
+.gallery-enveloppes {
   width: 90%;
 }
