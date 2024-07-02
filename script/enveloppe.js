@@ -257,8 +257,6 @@ function ouvrirModale(nom = "", montant = "", logo = "", mode = "creation", idEn
       modale.style.display = "none";
       form.reset();
       logoOptions.forEach((opt) => opt.classList.remove("selected"));
-    } else {
-      alert("Veuillez sélectionner un nom."); // Modifiez le message d'alerte pour refléter la validation actuelle
     }
   }
 

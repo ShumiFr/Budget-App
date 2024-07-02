@@ -6,6 +6,7 @@
   display: flex;
   justify-content: space-around;
   background: #1f2b5f;
+  z-index: 20;
 }
 
 .menu a {
